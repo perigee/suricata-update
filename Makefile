@@ -21,9 +21,10 @@ endif
 
 
 build:
-	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:tmp -f Dockerfile .
-	$(DOCKER_CMD) build --target runner -t mytmpsuricata:alma -f Dockerfile.alma .
+	$(DOCKER_CMD) build --target runner -t mytmpsuricata:node -f Dockerfile .
+	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:alma -f Dockerfile.alma .
 	#$(DOCKER_CMD) build --target build -t mytmpsuricata:tmp -f Dockerfile .
+	#$(DOCKER_CMD) build -t mytmpsuricata:apt -f Dockerfile.apt .
 
 fetch:
 	$(DOCKER_CMD) run -it --rm --net=host --cap-add=net_admin \
