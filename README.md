@@ -1,6 +1,6 @@
 # Suricata Note
 
-The most recommended way to fetch and update [Suricata signatures](https://docs.suricata.io/en/suricata-7.0.10/quickstart.html#signatures) is using the `suricata-update` tool, which is an official Suricata tool. This tool manages the ruleset by downloading, updating, and installing them into the specified location, typically `/var/lib/suricata/rules`
+The most recommended way to fetch and update [Suricata signatures](https://docs.suricata.io/en/suricata-7.0.10/quickstart.html#signatures) is using the `suricata-update` tool, which is an official Suricata tool. This tool manages the ruleset by downloading, updating, and installing them into the specified location, typically `/var/lib/suricata/rules`. 
 
 ## Attention
 The execution of jasonish/suricata has no gurantee of success on first run, due:
