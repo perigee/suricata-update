@@ -1,0 +1,36 @@
+FROM almalinux:9.5 AS build
+
+COPY suricata-7.0.10.tar.gz /tmp/suricata-7.0.10.tar.gz
+
+RUN dnf -y update && dnf install -y dnf-plugins-core epel-release && \
+    dnf config-manager --set-enable crb && \
+    dnf install -y rustc cargo cbindgen \
+    	gcc gcc-c++ jansson-devel libpcap-devel \
+	libyaml-devel make pcre2-devel zlib-devel && \
+    tar xzvf /tmp/suricata-7.0.10.tar.gz -C /tmp
+
+WORKDIR /tmp/suricata-7.0.10
+RUN ./configure --disable-gccmarch-native --prefix=/usr/ --sysconfdir=/etc --localstatedir=/var && \
+    make install install-conf DESTDIR=/fakeroot
+
+FROM almalinux:9.5 AS runner
+
+RUN dnf -y update && dnf install -y dnf-plugins-core epel-release && \
+    dnf config-manager --set-enable crb && \
+    dnf install -y cargo jansson-devel libpcap-devel \
+    	libyaml-devel pcre2-devel zlib-devel python3-yaml
+
+
+COPY --from=build /fakeroot/etc  /etc
+COPY --from=build /fakeroot/usr  /usr
+
+RUN mkdir -p /var/lib/suricata /var/log/suricata /run/lib/suricata
+
+#COPY --from=build /fakeroot/var/lib/suricata  /var/lib/suricata
+#COPY --from=build /fakeroot/var/log/suricata  /var/log/suricata
+#COPY --from=build /fakeroot/var/run/suricata  /var/run/suricata
+COPY update.yaml /etc/suricata/update.yaml
+
+RUN dnf install -y libnet
+RUN /usr/bin/suricata-update update-sources
+RUN /usr/bin/suricata-update --no-reload

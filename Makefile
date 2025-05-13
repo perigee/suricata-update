@@ -2,7 +2,7 @@
 
 UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
-
+SURICATA_IMG := jasonish/suricata:7.0.10-arm64
 
 
 ifeq ($(UNAME_S),Darwin)
@@ -21,7 +21,9 @@ endif
 
 
 build:
-	$(DOCKER_CMD) build --target build -t suricate:build -f Dockerfile .
+	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:tmp -f Dockerfile .
+	$(DOCKER_CMD) build --target runner -t mytmpsuricata:alma -f Dockerfile.alma .
+	#$(DOCKER_CMD) build --target build -t mytmpsuricata:tmp -f Dockerfile .
 
 fetch:
 	$(DOCKER_CMD) run -it --rm --net=host --cap-add=net_admin \
@@ -38,7 +40,7 @@ run:
 		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
 		-v $(PWD)/disable.conf:/etc/suricata/disable.conf \
 		-v $(PWD)/drop.conf:/etc/suricata/drop.conf \
-		$(SURICATA_IMG) suricata-update 
+		$(SURICATA_IMG) /bin/bash
 
 # /bin/sh
 # suricata-update update-sources
