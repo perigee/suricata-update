@@ -1,0 +1,6 @@
+FROM debian:trixie-slim 
+
+
+RUN apt-get -y update && apt-get -y install python3-launchpadlib && \
+    add-apt-repository -y ppa:oisf/suricata-stable && \
+    apt-get -y update && apt-get -y install suricata=6.0.10 # apt stable only has 6.0.10
