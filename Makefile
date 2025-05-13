@@ -1,3 +1,5 @@
+.PHONY: build fetch run
+
 UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
 
@@ -6,7 +8,7 @@ UNAME_P := $(shell uname -p)
 ifeq ($(UNAME_S),Darwin)
 	ifeq ($(UNAME_P),arm)
 		DOCKER_CMD := nerdctl.lima
-		MOUNT_ROOT := /tmp/lima/
+		MOUNT_ROOT := /tmp/lima/suricata
 	endif
 endif
 
@@ -17,7 +19,28 @@ ifeq ($(UNAME_S),Linux)
 	endif
 endif
 
-all:
-	@echo $(DOCKER_CMD)
 
+build:
+	$(DOCKER_CMD) build --target build -t suricate:build -f Dockerfile .
+
+fetch:
+	$(DOCKER_CMD) run -it --rm --net=host --cap-add=net_admin \
+		--cap-add=net_raw --cap-add=sys_nice \
+		-v $(MOUNT_ROOT)/var/log/suricata:/var/log/suricata \
+		-v $(MOUNT_ROOT)/etc/suricata:/etc/suricata \
+		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
+		$(SURICATA_IMG) suricata-update
+
+run:
+	$(DOCKER_CMD) run -ti --rm \
+		-v $(MOUNT_ROOT)/var/log/suricata:/var/log/suricata \
+		-v $(MOUNT_ROOT)/etc/suricata:/etc/suricata \
+		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
+		-v $(PWD)/disable.conf:/etc/suricata/disable.conf \
+		-v $(PWD)/drop.conf:/etc/suricata/drop.conf \
+		$(SURICATA_IMG) suricata-update 
+
+# /bin/sh
+# suricata-update update-sources
+# suricata-update --on-reload ## will not reload in case the process suricata is not running
 
