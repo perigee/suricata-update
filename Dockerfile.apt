@@ -3,7 +3,14 @@ FROM ubuntu:noble
 
 RUN apt -y update && apt -y install software-properties-common python3-launchpadlib && \
     add-apt-repository -y ppa:oisf/suricata-stable && \
-    apt -y update && apt -y install suricata=1:7.0.10-0ubuntu0
+    apt -y update && apt -y install suricata=1:7.0.10-0ubuntu0 \
+    	nodejs=18.19.1+dfsg-6ubuntu5
 
+RUN useradd -Ms /bin/bash suricata && chown -R suricata:suricata /var/log/suricata && \
+    mkdir -p /var/lib/suricata && \
+    chown -R suricata:suricata /var/lib/suricata && \
+    chown -R suricata:suricata /etc/suricata
 
-RUN suricata -V
+USER suricata
+
+#RUN suricata -V

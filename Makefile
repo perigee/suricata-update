@@ -3,7 +3,7 @@
 UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
 SURICATA_IMG := jasonish/suricata:7.0.10-arm64
-
+IMG_NAME := p-suricate
 
 ifeq ($(UNAME_S),Darwin)
 	ifeq ($(UNAME_P),arm)
@@ -21,10 +21,10 @@ endif
 
 
 build:
-	$(DOCKER_CMD) build --target runner -t mytmpsuricata:node -f Dockerfile .
+	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:node -f Dockerfile .
 	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:alma -f Dockerfile.alma .
 	#$(DOCKER_CMD) build --target build -t mytmpsuricata:tmp -f Dockerfile .
-	#$(DOCKER_CMD) build -t mytmpsuricata:apt -f Dockerfile.apt .
+	$(DOCKER_CMD) build -t $(IMG_NAME):apt -f Dockerfile.apt .
 
 fetch:
 	$(DOCKER_CMD) run -it --rm --net=host --cap-add=net_admin \
