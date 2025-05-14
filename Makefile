@@ -28,7 +28,8 @@ build:
 	$(DOCKER_CMD) build -t $(IMG_NAME) -f Dockerfile .
 
 run: build
-	$(DOCKER_CMD) run -it --rm --net=host --cap-add=net_admin \
+	$(DOCKER_CMD) run -it --rm \
+		--net=host --cap-add=net_admin \
 		--cap-add=net_raw --cap-add=sys_nice \
 		-v $(MOUNT_ROOT)/var/log/suricata:/var/log/suricata \
 		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
