@@ -1,8 +1,7 @@
-.PHONY: build fetch run
+.PHONY: init build fetch run dev
 
 UNAME_S := $(shell uname -s)
 UNAME_P := $(shell uname -p)
-SURICATA_IMG := jasonish/suricata:7.0.10-arm64
 IMG_NAME := p-suricate
 
 ifeq ($(UNAME_S),Darwin)
@@ -20,28 +19,28 @@ ifeq ($(UNAME_S),Linux)
 endif
 
 
-build:
-	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:node -f Dockerfile .
-	#$(DOCKER_CMD) build --target runner -t mytmpsuricata:alma -f Dockerfile.alma .
-	#$(DOCKER_CMD) build --target build -t mytmpsuricata:tmp -f Dockerfile .
-	$(DOCKER_CMD) build -t $(IMG_NAME):apt -f Dockerfile.apt .
+init:
+	mkdir -p $(MOUNT_ROOT)
+	mkdir -p $(MOUNT_ROOT)/var/lib/suricata \
+		 $(MOUNT_ROOT)/var/log/suricata
 
-fetch:
+build:
+	$(DOCKER_CMD) build -t $(IMG_NAME) -f Dockerfile .
+
+run: build
 	$(DOCKER_CMD) run -it --rm --net=host --cap-add=net_admin \
 		--cap-add=net_raw --cap-add=sys_nice \
 		-v $(MOUNT_ROOT)/var/log/suricata:/var/log/suricata \
-		-v $(MOUNT_ROOT)/etc/suricata:/etc/suricata \
 		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
-		$(SURICATA_IMG) suricata-update
+		$(IMG_NAME)
 
-run:
+dev: build
 	$(DOCKER_CMD) run -ti --rm \
 		-v $(MOUNT_ROOT)/var/log/suricata:/var/log/suricata \
-		-v $(MOUNT_ROOT)/etc/suricata:/etc/suricata \
 		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
 		-v $(PWD)/disable.conf:/etc/suricata/disable.conf \
 		-v $(PWD)/drop.conf:/etc/suricata/drop.conf \
-		$(SURICATA_IMG) /bin/bash
+		$(IMG_NAME) /bin/bash
 
 # /bin/sh
 # suricata-update update-sources

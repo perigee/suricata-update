@@ -1,33 +1,17 @@
-FROM debian:12.10-slim AS build
+FROM ubuntu:noble
 
 
-COPY suricata-7.0.10.tar.gz /tmp/suricata-7.0.10.tar.gz
+RUN apt -y update && apt -y install software-properties-common python3-launchpadlib && \
+    add-apt-repository -y ppa:oisf/suricata-stable && \
+    apt -y update && apt -y install suricata=1:7.0.10-0ubuntu0
 
-RUN apt update && apt -y install autoconf automake build-essential cargo \
-    cbindgen libjansson-dev libpcap-dev libpcre2-dev libtool \
-    libyaml-dev make pkg-config rustc zlib1g-dev && \
-    tar xzvf /tmp/suricata-7.0.10.tar.gz -C /tmp
-
-WORKDIR /tmp/suricata-7.0.10
-RUN ./configure --disable-gccmarch-native --prefix=/usr/ --sysconfdir=/etc --localstatedir=/var && \
-    make install install-conf DESTDIR=/fakeroot
-
-FROM node:24.0.1-slim AS runner
-
-RUN apt update && apt -y install cargo \
-    libjansson-dev libpcap-dev libpcre2-dev libtool libyaml-dev zlib1g-dev
+ADD update.yaml /etc/suricata/update.yaml
 
 
-COPY --from=build /fakeroot/etc  /etc
-COPY --from=build /fakeroot/usr  /usr
-COPY --from=build /fakeroot/var/lib/suricata  /var/lib/suricata
-COPY --from=build /fakeroot/var/log/suricata  /var/log/suricata
-COPY --from=build /fakeroot/var/run/suricata  /var/run/suricata
-#COPY --from=build /fakeroot  /fakeroot
-COPY update.yaml /etc/suricata/update.yaml
+RUN useradd -Mrs /bin/bash suricata && chown -R suricata:suricata /var/log/suricata && \
+    mkdir -p /var/lib/suricata && \
+    chown -R suricata:suricata /var/lib/suricata && \
+    chown -R suricata:suricata /etc/suricata
 
-# clean up
-RUN /usr/bin/suricata-update update-sources
-RUN /usr/bin/suricata-update --no-reload
+USER suricata
 
-RUN rm -rf /var/lib/apt/lists/*
