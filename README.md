@@ -27,3 +27,4 @@ due to race condition inside container, may missing `/var/run/suricata/suricata-
 ### References
 - [config](https://suricata-update.readthedocs.io/en/latest/update.html)
 - [keywords](https://docs.suricata.io/en/latest/rules/meta.html#metadata)
+- [A solution with flowbit](https://forum.suricata.io/t/write-suricata-rules-trigger-condition-to-both-http-request-and-http-response/3719/2)

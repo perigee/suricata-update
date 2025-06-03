@@ -37,6 +37,10 @@ run: build
 
 dev: build
 	$(DOCKER_CMD) run -ti --rm \
+		--user root \
+		--network host \
+		--cap-add=sys_admin \
+		--cap-add=net_admin --cap-add=net_raw --cap-add=sys_nice \
 		-v $(MOUNT_ROOT)/var/log/suricata:/var/log/suricata \
 		-v $(MOUNT_ROOT)/var/lib/suricata:/var/lib/suricata \
 		-v $(PWD)/disable.conf:/etc/suricata/disable.conf \
